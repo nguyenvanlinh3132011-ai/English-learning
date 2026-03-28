@@ -3,267 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GRAMMARARENA FX - Web Edition</title>
+    <title>GRAMMAR ARENA: INFINITY 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --p: #9333ea; --s: #bef264; --w: #fbbf24; --d: #ff6b6b; --blue: #7dd3fc; }
+        :root { --p: #9333ea; --s: #bef264; --w: #fbbf24; --d: #ff6b6b; --blue: #7dd3fc; --dark: #1a1a1a; }
         * { box-sizing: border-box; font-family: 'Lexend', sans-serif; }
-        body { background-color: #fdfaf6; margin: 0; padding: 15px; color: #000; }
+        body { background-color: #fdfaf6; margin: 0; padding: 10px; color: var(--dark); }
         
         .neu-card {
-            border: 4px solid #000; border-radius: 15px; padding: 20px;
-            box-shadow: 6px 6px 0px 0px #000; background: white; margin-bottom: 20px;
+            border: 4px solid var(--dark); border-radius: 15px; padding: 20px;
+            box-shadow: 6px 6px 0px 0px var(--dark); background: white; margin-bottom: 20px;
         }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         .btn-neu {
-            width: 100%; border: 4px solid #000; box-shadow: 4px 4px 0px 0px #000;
-            background-color: #fff; color: #000; font-weight: 900; border-radius: 12px;
-            padding: 12px; font-size: 1rem; text-transform: uppercase; cursor: pointer; transition: 0.1s;
+            width: 100%; border: 4px solid var(--dark); box-shadow: 4px 4px 0px 0px var(--dark);
+            background-color: #fff; font-weight: 900; border-radius: 12px;
+            padding: 12px; cursor: pointer; transition: 0.1s; text-transform: uppercase;
         }
-        .btn-neu:hover { background-color: #f0f0f0; transform: translate(-2px, -2px); }
-        .btn-neu:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px 0px #000; }
+        .btn-neu:hover { transform: translate(-2px, -2px); background: #fafafa; }
+        .btn-neu:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--dark); }
         
-        .prog-container { background: #eee; border: 2px solid #000; height: 14px; border-radius: 7px; overflow: hidden; margin: 8px 0; }
-        .prog-bar { background: #000; height: 100%; width: 0%; transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-
-        .tag { padding: 3px 10px; border: 2.5px solid #000; border-radius: 6px; font-size: 0.75rem; font-weight: 900; }
-
-        #quiz-view { display: none; }
+        .tag { padding: 4px 10px; border: 2.5px solid var(--dark); border-radius: 6px; font-size: 0.75rem; font-weight: 900; }
+        
+        #quiz-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fdfaf6; z-index: 1000; padding: 20px; overflow-y: auto; }
         
         .word-chip {
-            display: inline-block; padding: 8px 14px; border: 3px solid #000;
-            background: #fff; margin: 5px; cursor: pointer; font-weight: 800; border-radius: 10px;
-            box-shadow: 3px 3px 0px #000;
+            display: inline-block; padding: 12px 18px; border: 3px solid var(--dark);
+            background: #fff; margin: 6px; cursor: pointer; font-weight: 800; border-radius: 10px;
+            box-shadow: 3px 3px 0px var(--dark);
         }
-        .word-chip:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #000; }
-
         input.neu-input {
-            width: 100%; border: 4px solid #000; padding: 15px; font-size: 1.3rem;
-            border-radius: 12px; outline: none; margin-bottom: 15px; text-align: center;
-            box-shadow: 4px 4px 0px #000;
+            width: 100%; border: 4px solid var(--dark); padding: 15px; font-size: 1.4rem;
+            border-radius: 12px; outline: none; margin-bottom: 15px; text-align: center; box-shadow: 4px 4px 0px var(--dark);
         }
-
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
-        .shake { animation: shake 0.3s; background: #fee2e2 !important; border-color: var(--d) !important; }
+        .shake { animation: shake 0.3s; background: #fee2e2 !important; }
     </style>
 </head>
 <body>
 
-    <div class="neu-card flex-between" style="position: sticky; top: 0; z-index: 100; background: #fff; padding: 10px 20px;">
-        <div style="font-weight:900; font-size:1.5rem;">🦉 ARENA <span id="rank-tag" class="tag" style="background:var(--w)">ROOKIE</span></div>
-        <div style="display:flex; gap:10px;">
-            <div class="tag" style="background:var(--s);">🔥 <span id="xp-display">0</span> XP</div>
-        </div>
+    <!-- Header -->
+    <div class="neu-card flex-between" style="position: sticky; top: 0; z-index: 99; background: white;">
+        <div style="font-weight:900; font-size:1.3rem;">🦉 GRAMMAR <span style="color:var(--p)">INFINITY</span></div>
+        <div class="tag" style="background:var(--s); font-size:1rem;">XP: <span id="global-xp">0</span></div>
     </div>
 
+    <!-- Map View -->
     <div id="map-view">
-        <div class="neu-card" style="background: var(--p); color: white;">
-            <h1 style="margin:0;">TENSE QUEST MAP 🗺️</h1>
-            <p style="font-weight:600;">Chinh phục 12 thì - Thuộc lòng 3000 từ!</p>
+        <div class="neu-card" style="background: var(--blue);">
+            <h2 style="margin:0;">INFINITY GENERATOR v2.0</h2>
+            <p style="font-weight:700;">Hệ thống đã sẵn sàng tạo ra >10.000 câu hỏi ngẫu nhiên.</p>
         </div>
 
-        <h3>BATTLE STAGES</h3>
-        <div class="grid-2" id="tense-grid"></div>
+        <div class="grid-2" id="stage-list"></div>
 
-        <div class="grid-2">
-            <div class="neu-card">
-                <h3>🎴 SMART FLASHCARD</h3>
-                <div id="fc-box" style="text-align:center; padding: 15px; border: 3px dashed #000; border-radius: 10px; margin-bottom: 15px;">
-                    <div id="fc-word" style="font-size:2rem; font-weight:900; color:var(--p);">Algorithm</div>
-                    <div id="fc-phonetic" style="font-style:italic; font-weight:700; color:#555;">/ˈæl.ɡə.rɪ.ðəm/</div>
-                    <div id="fc-mean" style="font-size:1.1rem; font-weight:700; margin-top:10px;">Thuật toán</div>
-                </div>
-                <button class="btn-neu" onclick="nextFlashcard()">ĐÃ THUỘC! TIẾP 🔄</button>
+        <div class="neu-card" style="background: #fff;">
+            <h3>🎴 SMART FLASHCARDS (ANTI-LOOP)</h3>
+            <div id="fc-content" style="text-align:center; padding: 20px; border: 3px dashed var(--dark); margin-bottom: 15px; border-radius: 10px;">
+                <h1 id="fc-word" style="margin:0; color:var(--p); font-size: 2.5rem;">...</h1>
+                <p id="fc-mean" style="font-size:1.2rem; font-weight:700;">...</p>
             </div>
-
-            <div class="neu-card" style="background: var(--w);">
-                <h3>🏆 LEADERBOARD</h3>
-                <div style="font-weight:900; border-bottom: 2px solid #000; padding: 5px 0;">#1 YOU (<span class="user-xp">0</span> XP)</div>
-                <div style="font-weight:700; opacity: 0.7; padding: 5px 0;">#2 Bot_Pro (1,500 XP)</div>
-                <div style="font-weight:700; opacity: 0.7; padding: 5px 0;">#3 Oxford_AI (1,250 XP)</div>
-                <button class="btn-neu" style="background:#ff4b4b; color:#fff; margin-top:10px; font-size:0.8rem;" onclick="resetData()">RESET ALL ⚠️</button>
-            </div>
+            <button class="btn-neu" onclick="nextSmartFlashcard()">HỌC TỪ TIẾP THEO 🔄</button>
         </div>
     </div>
 
+    <!-- Quiz View -->
     <div id="quiz-view">
-        <div class="neu-card">
-            <div class="flex-between">
-                <span id="quiz-title-tag" class="tag" style="background:white;">PRESENT SIMPLE</span>
-                <span id="combo-tag" style="font-weight:900; color:var(--d);"></span>
+        <div class="neu-card" style="max-width: 600px; margin: auto;">
+            <div class="flex-between" style="margin-bottom: 20px;">
+                <span id="quiz-title" class="tag" style="background:var(--w);">PRESENT SIMPLE</span>
+                <span id="combo-display" style="font-weight:900; color:var(--d);"></span>
             </div>
-            <div id="q-container" style="text-align:center; padding: 50px 10px; min-height: 300px;">
-                <h2 id="q-text" style="font-size: 1.8rem; line-height: 1.4;">Loading...</h2>
-                <div id="ans-zone" style="margin-top: 30px;"></div>
+            <div id="question-box" style="text-align:center; min-height: 300px;">
+                <h2 id="q-text" style="font-size: 1.7rem; line-height: 1.4; margin-bottom: 30px;">...</h2>
+                <div id="ans-zone"></div>
             </div>
-            <button class="btn-neu" style="background:#e5e7eb;" onclick="exitQuiz()">⬅️ RÚT LUI VỀ BẢN ĐỒ</button>
+            <button class="btn-neu" style="background:#ddd; margin-top:30px;" onclick="exitQuiz()">🏳️ DỪNG CUỘC CHƠI</button>
         </div>
     </div>
 
     <script>
-        const STAGES = [
-            { id: 'pres_sim', name: 'Present Simple', color: '#bef264', lvl: 1 },
-            { id: 'pres_cont', name: 'Present Cont.', color: '#7dd3fc', lvl: 1 },
-            { id: 'past_sim', name: 'Past Simple', color: '#fbbf24', lvl: 2 },
-            { id: 'past_cont', name: 'Past Cont.', color: '#ff90e8', lvl: 2 },
-            { id: 'pres_perf', name: 'Pres. Perfect', color: '#ff6b6b', lvl: 3 },
-            { id: 'fut_sim', name: 'Future Simple', color: '#9333ea', lvl: 1 }
-        ];
-
-        const QUIZ_DB = {
-            'pres_sim': [
-                {q: "She (not/drink) ___ tea.", a: "doesn't drink", type: 1, dist: ["don't drink", "not drink"]},
-                {q: "The sun (rise) ___ in the East.", a: "rises", type: 1, dist: ["rising", "rise"]}
+        // --- NGÂN HÀNG DỮ LIỆU KHỔNG LỒ (THE DATA MATRIX) ---
+        const DATA_MATRIX = {
+            subjects: [
+                {n: "The software engineer", sing: true}, {n: "My best friends", sing: false}, 
+                {n: "The CEO", sing: true}, {n: "A mysterious robot", sing: true}, 
+                {n: "Our professors", sing: false}, {n: "The chef", sing: true},
+                {n: "Many tourists", sing: false}, {n: "The pilot", sing: true},
+                {n: "The cat", sing: true}, {n: "Cybersecurity experts", sing: false}
             ],
-            'pres_cont': [
-                {q: "Look! They (run) ___ towards us.", a: "are running", type: 1, dist: ["run", "is running"]},
-                {q: "I / currently / reading / am / a book", a: "I am currently reading a book", type: 2, words: ["am", "reading", "I", "currently", "a book"]}
+            verbs: [
+                {base: "analyze", s: "analyzes", ed: "analyzed", ing: "analyzing", m: "phân tích"},
+                {base: "develop", s: "develops", ed: "developed", ing: "developing", m: "phát triển"},
+                {base: "organize", s: "organizes", ed: "organized", ing: "organizing", m: "tổ chức"},
+                {base: "protect", s: "protects", ed: "protected", ing: "protecting", m: "bảo vệ"},
+                {base: "explore", s: "explores", ed: "explored", ing: "exploring", m: "khám phá"},
+                {base: "construct", s: "constructs", ed: "constructed", ing: "constructing", m: "xây dựng"},
+                {base: "improve", s: "improves", ed: "improved", ing: "improving", m: "cải thiện"},
+                {base: "investigate", s: "investigates", ed: "investigated", ing: "investigating", m: "điều tra"},
+                {base: "create", s: "creates", ed: "created", ing: "creating", m: "tạo ra"},
+                {base: "observe", s: "observes", ed: "observed", ing: "observing", m: "quan sát"}
             ],
-            'past_sim': [
-                {q: "We / visited / Paris / last / summer", a: "We visited Paris last summer", type: 2, words: ["visited", "Paris", "We", "summer", "last"]},
-                {q: "He / bought / a / new / car / yesterday", a: "He bought a new car yesterday", type: 2, words: ["a", "bought", "yesterday", "car", "new", "He"]}
+            objects: [
+                "a new digital system", "the complex data", "an ancient temple", 
+                "the global market", "a luxury restaurant", "the security firewall",
+                "the deep ocean", "a secret experiment", "the project results"
             ],
-            'past_cont': [
-                {q: "What (you/do) ___ at 8 PM yesterday?", a: "were you doing", type: 1, dist: ["was you doing", "did you do"]},
-                {q: "She (sleep) ___ when I called.", a: "was sleeping", type: 3}
-            ],
-            'pres_perf': [
-                {q: "I (be) ___ to Japan twice.", a: "have been", type: 3},
-                {q: "She (just/finish) ___ her lunch.", a: "has just finished", type: 3}
-            ],
-            'fut_sim': [
-                {q: "I think it (rain) ___ tomorrow.", a: "will rain", type: 1, dist: ["rains", "is raining"]},
-                {q: "They / won't / the / attend / meeting", a: "They won't attend the meeting", type: 2, words: ["won't", "attend", "meeting", "the", "They"]}
-            ]
+            time: {
+                pres_sim: ["every morning", "frequently", "on Mondays", "once a week"],
+                pres_cont: ["at this moment", "right now", "currently"],
+                past_sim: ["yesterday", "two days ago", "last night", "in 2024"],
+                fut_sim: ["tomorrow", "next year", "soon", "in the future"]
+            }
         };
 
-        const VOCAB_LIST = [
-            {w: "Algorithm", p: "/ˈæl.ɡə.rɪ.ðəm/ (n)", m: "Thuật toán"},
-            {w: "Substantial", p: "/səbˈstæn.ʃəl/ (adj)", m: "Đáng kể"},
-            {w: "Persuade", p: "/pəˈsweɪd/ (v)", m: "Thuyết phục"},
-            {w: "Hierarchy", p: "/ˈhaɪə.rɑː.ki/ (n)", m: "Hệ tư tưởng/Cấp bậc"},
-            {w: "Ambiguous", p: "/æmˈbɪɡ.ju.əs/ (adj)", m: "Mơ hồ"}
+        const STAGES = [
+            { id: 'pres_sim', name: 'Present Simple', color: '#bef264', type: 1 },
+            { id: 'pres_cont', name: 'Present Continuous', color: '#7dd3fc', type: 1 },
+            { id: 'past_sim', name: 'Past Simple', color: '#fbbf24', type: 2 },
+            { id: 'fut_sim', name: 'Future Simple', color: '#ff90e8', type: 3 }
         ];
 
+        // --- STATE ---
         let xp = 0;
-        let progress = {};
-        let vocabQueue = [...VOCAB_LIST].sort(() => Math.random() - 0.5);
-        let curQData = [];
-        let curQIdx = 0;
-        let curStage = null;
-        let isChecking = false;
+        let combo = 0;
+        let curTense = "";
+        let vocabQueue = [...DATA_MATRIX.verbs].sort(() => Math.random() - 0.5);
 
+        // --- GENERATOR ENGINE (NHÀ MÁY SẢN XUẤT BÀI TẬP) ---
+        function generateInfinityQuestion(tenseId) {
+            const sub = DATA_MATRIX.subjects[Math.floor(Math.random() * DATA_MATRIX.subjects.length)];
+            const v = DATA_MATRIX.verbs[Math.floor(Math.random() * DATA_MATRIX.verbs.length)];
+            const obj = DATA_MATRIX.objects[Math.floor(Math.random() * DATA_MATRIX.objects.length)];
+            const time = DATA_MATRIX.time[tenseId][Math.floor(Math.random() * DATA_MATRIX.time[tenseId].length)];
+            
+            let q = "", a = "", dist = [], words = [];
+
+            if (tenseId === 'pres_sim') {
+                q = `${sub.n} (${v.base}) ___ ${obj} ${time}.`;
+                a = sub.sing ? v.s : v.base;
+                dist = [v.ing, v.ed, sub.sing ? v.base : v.s];
+            } else if (tenseId === 'pres_cont') {
+                let be = sub.sing ? "is" : "are";
+                q = `${sub.n} (be/work) ___ ${obj} ${time}.`;
+                a = `${be} ${v.ing}`;
+                dist = [`${be} ${v.ed}`, `am ${v.ing}`, v.s];
+            } else if (tenseId === 'past_sim') {
+                q = `${sub.n} / ${v.ed} / ${obj} / ${time}`;
+                a = `${sub.n} ${v.ed} ${obj} ${time}`;
+                words = [sub.n, v.ed, obj, time].sort(() => Math.random() - 0.5);
+            } else if (tenseId === 'fut_sim') {
+                q = `I hope ${sub.n} (${v.base}) ___ ${obj} ${time}.`;
+                a = `will ${v.base}`;
+                dist = [`won't ${v.base}`, `will ${v.ing}`, v.ed];
+            }
+
+            return { q, a, dist, words, type: (tenseId === 'past_sim' ? 2 : (tenseId === 'fut_sim' ? 3 : 1)) };
+        }
+
+        // --- UI RENDER ---
         function renderMap() {
-            const grid = document.getElementById('tense-grid');
-            grid.innerHTML = '';
+            const list = document.getElementById('stage-list');
+            list.innerHTML = '';
             STAGES.forEach(s => {
-                const p = progress[s.id] || 0;
-                grid.innerHTML += `
+                list.innerHTML += `
                     <div class="neu-card" style="background:${s.color}">
-                        <div class="flex-between"><span class="tag" style="background:#fff">LVL.${s.lvl}</span> <b>${p}%</b></div>
-                        <h3 style="margin:10px 0">${s.name}</h3>
-                        <div class="prog-container"><div class="prog-bar" style="width:${p}%"></div></div>
-                        <button class="btn-neu" style="padding:8px; font-size:0.8rem;" onclick="startQuiz('${s.id}')">BẮT ĐẦU</button>
+                        <h3 style="margin:0 0 10px 0">${s.name}</h3>
+                        <div class="tag" style="background:white; margin-bottom:10px;">INFINITY MODE</div>
+                        <button class="btn-neu" onclick="startQuiz('${s.id}')">VÀO TRẬN</button>
                     </div>
                 `;
             });
-            document.getElementById('xp-display').innerText = xp;
-            document.querySelectorAll('.user-xp').forEach(el => el.innerText = xp);
-        }
-
-        function nextFlashcard() {
-            if (vocabQueue.length === 0) vocabQueue = [...VOCAB_LIST].sort(() => Math.random() - 0.5);
-            const item = vocabQueue.shift();
-            document.getElementById('fc-word').innerText = item.w;
-            document.getElementById('fc-phonetic').innerText = item.p;
-            document.getElementById('fc-mean').innerText = item.m;
+            document.getElementById('global-xp').innerText = xp;
         }
 
         function startQuiz(id) {
-            curStage = STAGES.find(s => s.id === id);
-            curQData = (QUIZ_DB[id] || QUIZ_DB['pres_sim']).sort(() => Math.random() - 0.5);
-            curQIdx = 0;
+            curTense = id;
+            combo = 0;
             document.getElementById('map-view').style.display = 'none';
             document.getElementById('quiz-view').style.display = 'block';
-            document.getElementById('quiz-title-tag').innerText = curStage.name.toUpperCase();
-            loadQuestion();
+            nextQuestion();
         }
 
-        function loadQuestion() {
-            const q = curQData[curQIdx];
-            const zone = document.getElementById('ans-zone');
+        function nextQuestion() {
+            const q = generateInfinityQuestion(curTense);
+            document.getElementById('quiz-title').innerText = curTense.replace('_',' ').toUpperCase();
             document.getElementById('q-text').innerText = q.q;
+            document.getElementById('combo-display').innerText = combo > 1 ? `🔥 COMBO X${combo}` : '';
+            
+            const zone = document.getElementById('ans-zone');
             zone.innerHTML = '';
-            isChecking = false;
 
-            if (q.type === 1) {
-                const opts = [...q.dist, q.a].sort(() => Math.random() - 0.5);
-                opts.forEach(opt => {
+            if (q.type === 1 || q.type === 3) { // Multiple choice
+                const all = [...q.dist, q.a].sort(() => Math.random() - 0.5);
+                all.forEach(opt => {
                     const b = document.createElement('button');
-                    b.className = 'btn-neu';
-                    b.style.marginBottom = '10px';
+                    b.className = 'btn-neu'; b.style.marginBottom = '10px';
                     b.innerText = opt;
                     b.onclick = () => checkAns(opt, q.a);
                     zone.appendChild(b);
                 });
-            } else if (q.type === 2) {
+            } else if (q.type === 2) { // Scramble
                 let userArr = [];
                 const display = document.createElement('div');
-                display.className = 'neu-card';
-                display.style.minHeight = '60px';
-                display.style.fontSize = '1.3rem';
-                display.style.fontWeight = '800';
+                display.className = 'neu-card'; display.style.minHeight = '60px'; display.style.fontSize = '1.2rem';
                 zone.appendChild(display);
-
-                q.words.sort(() => Math.random() - 0.5).forEach(w => {
-                    const chip = document.createElement('span');
-                    chip.className = 'word-chip';
-                    chip.innerText = w;
-                    chip.onclick = () => {
-                        if (isChecking) return;
-                        userArr.push(w);
-                        display.innerText = userArr.join(" ");
-                        chip.style.visibility = 'hidden';
-                        if(userArr.length === q.words.length) checkAns(userArr.join(" "), q.a);
+                q.words.forEach(w => {
+                    const c = document.createElement('span');
+                    c.className = 'word-chip'; c.innerText = w;
+                    c.onclick = () => {
+                        userArr.push(w); display.innerText = userArr.join(" "); c.style.visibility = 'hidden';
+                        if(userArr.length === q.words.length) setTimeout(() => checkAns(userArr.join(" "), q.a), 400);
                     };
-                    zone.appendChild(chip);
+                    zone.appendChild(c);
                 });
-            } else if (q.type === 3) {
-                const input = document.createElement('input');
-                input.className = 'neu-input';
-                input.placeholder = "Nhập đáp án...";
-                input.onkeypress = (e) => { if(e.key === 'Enter') checkAns(input.value.trim(), q.a); };
-                zone.appendChild(input);
-                const btn = document.createElement('button');
-                btn.className = 'btn-neu';
-                btn.innerText = "KIỂM TRA";
-                btn.onclick = () => checkAns(input.value.trim(), q.a);
-                zone.appendChild(btn);
             }
         }
 
         function checkAns(input, target) {
-            if (isChecking) return;
-            isChecking = true;
-            const box = document.getElementById('q-container');
             if (input.toLowerCase() === target.toLowerCase()) {
-                confetti({ particleCount: 100, spread: 70 });
-                xp += (curStage.lvl * 20);
-                progress[curStage.id] = Math.min(100, (progress[curStage.id] || 0) + 20);
-                document.getElementById('xp-display').innerText = xp;
-                curQIdx++;
-                if(curQIdx < curQData.length) setTimeout(loadQuestion, 800);
-                else { setTimeout(() => { alert("STAGE CLEAR! 🎉"); exitQuiz(); }, 800); }
+                confetti({ particleCount: 50, spread: 60 });
+                combo++;
+                xp += (10 * combo);
+                document.getElementById('global-xp').innerText = xp;
+                setTimeout(nextQuestion, 600);
             } else {
-                box.classList.add('shake');
-                setTimeout(() => {
-                    box.classList.remove('shake');
-                    if (curQData[curQIdx].type === 2) loadQuestion();
-                    else isChecking = false;
-                }, 400);
+                combo = 0;
+                document.getElementById('question-box').classList.add('shake');
+                setTimeout(() => document.getElementById('question-box').classList.remove('shake'), 400);
             }
         }
 
@@ -273,12 +243,16 @@
             renderMap();
         }
 
-        function resetData() {
-            if(confirm("Xóa toàn bộ tiến độ?")) { xp = 0; progress = {}; renderMap(); }
+        // Flashcards Logic
+        function nextSmartFlashcard() {
+            if (vocabQueue.length === 0) vocabQueue = [...DATA_MATRIX.verbs].sort(() => Math.random() - 0.5);
+            const v = vocabQueue.shift();
+            document.getElementById('fc-word').innerText = v.base.toUpperCase();
+            document.getElementById('fc-mean').innerText = `${v.m} (V2: ${v.ed})`;
         }
 
         renderMap();
-        nextFlashcard();
+        nextSmartFlashcard();
     </script>
 </body>
 </html>
