@@ -36,33 +36,26 @@
             background: #fff; margin: 6px; cursor: pointer; font-weight: 800; border-radius: 10px;
             box-shadow: 3px 3px 0px var(--dark);
         }
-        input.neu-input {
-            width: 100%; border: 4px solid var(--dark); padding: 15px; font-size: 1.4rem;
-            border-radius: 12px; outline: none; margin-bottom: 15px; text-align: center; box-shadow: 4px 4px 0px var(--dark);
-        }
+        .shake { animation: shake 0.3s; background: #fee2e2 !important; border-color: var(--d) !important; }
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
-        .shake { animation: shake 0.3s; background: #fee2e2 !important; }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
     <div class="neu-card flex-between" style="position: sticky; top: 0; z-index: 99; background: white;">
         <div style="font-weight:900; font-size:1.3rem;">🎯 EXAM <span style="color:var(--p)">MASTER</span></div>
         <div class="tag" style="background:var(--s); font-size:1rem;">XP: <span id="global-xp">0</span></div>
     </div>
 
-    <!-- Map View -->
     <div id="map-view">
         <div class="neu-card" style="background: var(--blue);">
             <h2 style="margin:0;">REAL EXAM DATABASE 📑</h2>
-            <p style="font-weight:700;">Đã cập nhật cấu trúc từ đề thi IELTS, TOEIC & THPTQG.</p>
+            <p style="font-weight:700;">Hệ thống tự động trộn đề IELTS/TOEIC chuẩn 2026.</p>
         </div>
-
         <div class="grid-2" id="stage-list"></div>
 
         <div class="neu-card">
-            <h3>🎴 SMART FLASHCARDS (EXAM VOCAB)</h3>
+            <h3>🎴 SMART FLASHCARDS</h3>
             <div id="fc-content" style="text-align:center; padding: 20px; border: 3px dashed var(--dark); margin-bottom: 15px; border-radius: 10px;">
                 <h1 id="fc-word" style="margin:0; color:var(--p); font-size: 2.2rem;">...</h1>
                 <p id="fc-mean" style="font-size:1.1rem; font-weight:700;">...</p>
@@ -71,14 +64,13 @@
         </div>
     </div>
 
-    <!-- Quiz View -->
     <div id="quiz-view">
         <div class="neu-card" style="max-width: 600px; margin: auto;">
             <div class="flex-between" style="margin-bottom: 20px;">
                 <div id="exam-source" class="exam-label">IELTS ACADEMIC</div>
                 <span id="quiz-title" class="tag" style="background:var(--w);">...</span>
             </div>
-            <div id="question-box" style="text-align:center; min-height: 250px;">
+            <div id="question-box" style="text-align:center; min-height: 250px; padding: 20px; border-radius: 15px; border: 4px solid transparent; transition: 0.3s;">
                 <h2 id="q-text" style="font-size: 1.5rem; line-height: 1.4; margin-bottom: 25px;">...</h2>
                 <div id="ans-zone"></div>
             </div>
@@ -87,7 +79,6 @@
     </div>
 
     <script>
-        // --- DATA MATRIX: EXAM EDITION ---
         const EXAM_DATA = {
             sources: ["TOEIC TEST", "IELTS ACADEMIC", "THPT QUỐC GIA", "CAMBRIDGE B2"],
             subjects: [
@@ -100,63 +91,61 @@
                 {base: "postpone", s: "postpones", ed: "postponed", ing: "postponing", m: "trì hoãn"},
                 {base: "contribute", s: "contributes", ed: "contributed", ing: "contributing", m: "đóng góp"},
                 {base: "enhance", s: "enhances", ed: "enhanced", ing: "enhancing", m: "nâng cao (cải thiện)"},
-                {base: "collaborate", s: "collaborates", ed: "collaborated", ing: "collaborating", m: "hợp tác"},
-                {base: "negotiate", s: "negotiates", ed: "negotiated", ing: "negotiating", m: "đàm phán"},
-                {base: "allocate", s: "allocates", ed: "allocated", ing: "allocating", m: "phân bổ"},
-                {base: "terminate", s: "terminates", ed: "terminated", ing: "terminating", m: "chấm dứt/kết thúc"}
+                {base: "collaborate", s: "collaborates", ed: "collaborated", ing: "collaborating", m: "hợp tác"}
             ],
             contexts: [
                 "new policies to boost productivity", "the annual conference until next week", 
                 "significantly to the global warming", "the living standards of residents",
-                "effectively on the international project", "the terms of the contract",
-                "limited resources to the education sector", "the agreement due to violations"
+                "effectively on the international project"
             ]
         };
 
         const STAGES = [
-            { id: 'pres_sim', name: 'Present Simple', color: '#bef264', type: 1 },
-            { id: 'pres_perf', name: 'Pres. Perfect', color: '#7dd3fc', type: 1 },
-            { id: 'past_sim', name: 'Past Simple', color: '#fbbf24', type: 2 },
-            { id: 'past_cont', name: 'Past Continuous', color: '#ff90e8', type: 1 }
+            { id: 'pres_sim', name: 'Present Simple', color: '#bef264' },
+            { id: 'pres_perf', name: 'Pres. Perfect', color: '#7dd3fc' },
+            { id: 'past_sim', name: 'Past Simple', color: '#fbbf24' },
+            { id: 'past_cont', name: 'Past Continuous', color: '#ff90e8' }
         ];
 
         let xp = 0;
         let curTense = "";
-        let vocabQueue = [...EXAM_DATA.verbs].sort(() => Math.random() - 0.5);
+        let isChecking = false;
 
-        // --- INFINITY EXAM GENERATOR ---
+        function isSingular(sub) {
+            const singulars = ["board", "rate", "Climate", "Each", "crisis", "technology", "department"];
+            return singulars.some(word => sub.includes(word));
+        }
+
         function generateExamQuestion(tenseId) {
             const src = EXAM_DATA.sources[Math.floor(Math.random() * EXAM_DATA.sources.length)];
             const sub = EXAM_DATA.subjects[Math.floor(Math.random() * EXAM_DATA.subjects.length)];
             const v = EXAM_DATA.verbs[Math.floor(Math.random() * EXAM_DATA.verbs.length)];
             const ctx = EXAM_DATA.contexts[Math.floor(Math.random() * EXAM_DATA.contexts.length)];
-            
-            let q = "", a = "", dist = [], words = [];
+            let q = "", a = "", dist = [], words = [], type = 1;
 
             if (tenseId === 'pres_sim') {
                 q = `${sub} usually (${v.base}) ___ ${ctx}.`;
-                a = (sub.includes("The board") || sub.includes("Climate") || sub.includes("Each") || sub.includes("crisis") || sub.includes("technology") || sub.includes("department")) ? v.s : v.base;
-                dist = [v.ing, v.ed, sub.includes("board") ? v.base : v.s];
+                a = isSingular(sub) ? v.s : v.base;
+                dist = [v.ing, v.ed, isSingular(sub) ? v.base : v.s];
             } else if (tenseId === 'pres_perf') {
-                let haveHas = (sub.includes("directors") || sub.includes("authorities") || sub.includes("startups") || sub.includes("participants")) ? "have" : "has";
+                let hv = isSingular(sub) ? "has" : "have";
                 q = `Since last year, ${sub} (${v.base}) ___ ${ctx}.`;
-                a = `${haveHas} ${v.ed}`;
-                dist = [`${haveHas} ${v.ing}`, `had ${v.ed}`, `${haveHas === 'have' ? 'has' : 'have'} ${v.ed}`];
+                a = `${hv} ${v.ed}`;
+                dist = [`${hv} ${v.ing}`, `had ${v.ed}`, `${hv === 'has' ? 'have' : 'has'} ${v.ed}`];
             } else if (tenseId === 'past_sim') {
-                q = `${sub} / ${v.ed} / ${ctx} / last / month`;
+                type = 2;
+                q = `Sắp xếp: ${sub} / ${v.ed} / ${ctx} / last month`;
                 a = `${sub} ${v.ed} ${ctx} last month`;
-                words = [sub, v.ed, ctx, "last month"].sort(() => Math.random() - 0.5);
+                words = [sub, v.ed, ctx, "last month"];
             } else if (tenseId === 'past_cont') {
-                let wasWere = (sub.includes("directors") || sub.includes("authorities") || sub.includes("startups") || sub.includes("participants")) ? "were" : "was";
-                q = `While ${sub} (${v.base}) ___ ${ctx}, the power went out.`;
-                a = `${wasWere} ${v.ing}`;
-                dist = [`${wasWere} ${v.ed}`, `is ${v.ing}`, `was ${v.ing}`];
+                let be = isSingular(sub) ? "was" : "were";
+                q = `While ${sub} (${v.base}) ___ ${ctx}, the phone rang.`;
+                a = `${be} ${v.ing}`;
+                dist = [`${be} ${v.ed}`, `is ${v.ing}`, `am ${v.ing}`];
             }
-
-            return { q, a, dist, words, src, type: (tenseId === 'past_sim' ? 2 : 1) };
+            return { q, a, dist, words, src, type };
         }
 
-        // --- UI RENDER ---
         function renderMap() {
             const list = document.getElementById('stage-list');
             list.innerHTML = '';
@@ -164,10 +153,8 @@
                 list.innerHTML += `
                     <div class="neu-card" style="background:${s.color}">
                         <h3 style="margin:0 0 10px 0">${s.name}</h3>
-                        <div class="tag" style="background:white; margin-bottom:10px;">EXAM MODE</div>
                         <button class="btn-neu" onclick="startQuiz('${s.id}')">LUYỆN ĐỀ</button>
-                    </div>
-                `;
+                    </div>`;
             });
             document.getElementById('global-xp').innerText = xp;
         }
@@ -180,34 +167,40 @@
         }
 
         function nextQuestion() {
+            isChecking = false;
             const q = generateExamQuestion(curTense);
-            document.getElementById('quiz-title').innerText = curTense.replace('_',' ').toUpperCase();
+            const box = document.getElementById('question-box');
+            box.style.borderColor = "transparent";
+            document.getElementById('quiz-title').innerText = curTense.toUpperCase();
             document.getElementById('exam-source').innerText = q.src;
             document.getElementById('q-text').innerText = q.q;
             
             const zone = document.getElementById('ans-zone');
             zone.innerHTML = '';
 
-            if (q.type === 1) { // Multiple choice
-                const all = [...q.dist, q.a].sort(() => Math.random() - 0.5);
-                all.forEach(opt => {
+            if (q.type === 1) {
+                const opts = [...q.dist, q.a].sort(() => Math.random() - 0.5);
+                opts.forEach(opt => {
                     const b = document.createElement('button');
                     b.className = 'btn-neu'; b.style.marginBottom = '10px';
                     b.innerText = opt;
                     b.onclick = () => checkAns(opt, q.a);
                     zone.appendChild(b);
                 });
-            } else if (q.type === 2) { // Scramble
+            } else {
                 let userArr = [];
                 const display = document.createElement('div');
-                display.className = 'neu-card'; display.style.minHeight = '60px'; display.style.fontSize = '1.1rem';
+                display.className = 'neu-card'; display.style.minHeight = '60px';
                 zone.appendChild(display);
-                q.words.forEach(w => {
+                q.words.sort(() => Math.random() - 0.5).forEach(w => {
                     const c = document.createElement('span');
                     c.className = 'word-chip'; c.innerText = w;
                     c.onclick = () => {
-                        userArr.push(w); display.innerText = userArr.join(" "); c.style.visibility = 'hidden';
-                        if(userArr.length === q.words.length) setTimeout(() => checkAns(userArr.join(" "), q.a), 400);
+                        if(isChecking) return;
+                        userArr.push(w);
+                        display.innerText = userArr.join(" ");
+                        c.style.visibility = 'hidden';
+                        if(userArr.length === q.words.length) checkAns(userArr.join(" "), q.a);
                     };
                     zone.appendChild(c);
                 });
@@ -215,14 +208,24 @@
         }
 
         function checkAns(input, target) {
-            if (input.toLowerCase() === target.toLowerCase()) {
-                confetti({ particleCount: 60, spread: 70 });
-                xp += 50; // Đề thi thực tế cho nhiều điểm hơn
+            if(isChecking) return;
+            isChecking = true;
+            const box = document.getElementById('question-box');
+            
+            if (input.trim().toLowerCase() === target.trim().toLowerCase()) {
+                confetti({ particleCount: 80, spread: 70 });
+                box.style.borderColor = "var(--s)";
+                xp += 50;
                 document.getElementById('global-xp').innerText = xp;
-                setTimeout(nextQuestion, 800);
+                setTimeout(nextQuestion, 1000);
             } else {
-                document.getElementById('question-box').classList.add('shake');
-                setTimeout(() => document.getElementById('question-box').classList.remove('shake'), 400);
+                box.classList.add('shake');
+                box.style.borderColor = "var(--d)";
+                setTimeout(() => {
+                    box.classList.remove('shake');
+                    if(curTense === 'past_sim') nextQuestion(); // Reset chips
+                    else isChecking = false;
+                }, 500);
             }
         }
 
@@ -233,8 +236,7 @@
         }
 
         function nextSmartFlashcard() {
-            if (vocabQueue.length === 0) vocabQueue = [...EXAM_DATA.verbs].sort(() => Math.random() - 0.5);
-            const v = vocabQueue.shift();
+            const v = EXAM_DATA.verbs[Math.floor(Math.random() * EXAM_DATA.verbs.length)];
             document.getElementById('fc-word').innerText = v.base.toUpperCase();
             document.getElementById('fc-mean').innerText = v.m;
         }
