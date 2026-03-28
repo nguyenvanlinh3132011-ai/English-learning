@@ -5,328 +5,281 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GRAMMARARENA FX - Web Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- Thư viện Pháo hoa -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
+        :root { --p: #9333ea; --s: #bef264; --w: #fbbf24; --d: #ff6b6b; --blue: #7dd3fc; }
         * { box-sizing: border-box; font-family: 'Lexend', sans-serif; }
-        body { background-color: #fdfaf6; margin: 0; padding: 20px; color: #000; }
+        body { background-color: #fdfaf6; margin: 0; padding: 15px; color: #000; }
         
-        /* Typography & Utils */
-        h1, h2, h3 { margin-top: 0; font-weight: 900; }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        
-        /* Neubrutalism Elements */
+        /* Giao diện Neobrutalism */
         .neu-card {
-            border: 4px solid #000; border-radius: 15px; padding: 25px;
+            border: 4px solid #000; border-radius: 15px; padding: 20px;
             box-shadow: 6px 6px 0px 0px #000; background: white; margin-bottom: 20px;
         }
-        
-        .header-bar { margin-bottom: 25px; }
-        
-        .welcome-banner { background: #d8b4fe; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         .btn-neu {
             width: 100%; border: 4px solid #000; box-shadow: 4px 4px 0px 0px #000;
             background-color: #fff; color: #000; font-weight: 900; border-radius: 12px;
-            padding: 15px; font-size: 1.1rem; text-transform: uppercase; 
-            cursor: pointer; transition: 0.1s;
+            padding: 12px; font-size: 1rem; text-transform: uppercase; cursor: pointer; transition: 0.1s;
         }
         .btn-neu:hover { background-color: #f0f0f0; transform: translate(-2px, -2px); }
-        .btn-neu:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px 0px #000; }
+        .btn-neu:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px 0px #000; }
         
-        .progress-container { background: white; border: 3px solid #000; height: 18px; border-radius: 10px; margin-top: 10px; overflow: hidden; }
-        .progress-bar { background: #000; height: 100%; width: 0%; transition: width 0.3s; }
-        
-        /* Animations */
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            50% { transform: translateX(10px); }
-            75% { transform: translateX(-10px); }
-            100% { transform: translateX(0); }
-        }
-        .shake-effect { animation: shake 0.4s ease-in-out; border-color: #ff4b4b !important; background-color: #fee2e2; }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-        .pulse-effect { animation: pulse 0.4s ease-in-out; border-color: #58cc02 !important; background-color: #dcfce7; }
+        /* Thanh tiến trình */
+        .prog-container { background: #eee; border: 2px solid #000; height: 14px; border-radius: 7px; overflow: hidden; margin: 8px 0; }
+        .prog-bar { background: #000; height: 100%; width: 0%; transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-        /* View Switching */
+        .tag { padding: 3px 10px; border: 2.5px solid #000; border-radius: 6px; font-size: 0.75rem; font-weight: 900; }
+
         #quiz-view { display: none; }
+        
+        /* Chip sắp xếp câu */
+        .word-chip {
+            display: inline-block; padding: 8px 14px; border: 3px solid #000;
+            background: #fff; margin: 5px; cursor: pointer; font-weight: 800; border-radius: 10px;
+            box-shadow: 3px 3px 0px #000;
+        }
+        .word-chip:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #000; }
+
+        input.neu-input {
+            width: 100%; border: 4px solid #000; padding: 15px; font-size: 1.3rem;
+            border-radius: 12px; outline: none; margin-bottom: 15px; text-align: center;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        /* Hiệu ứng */
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
+        .shake { animation: shake 0.3s; background: #fee2e2 !important; border-color: var(--d) !important; }
     </style>
 </head>
 <body>
 
-    <!-- Âm thanh ẩn -->
-    <audio id="sound-success" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
-    <audio id="sound-fail" src="https://www.soundjay.com/misc/sounds/fail-trombone-01.mp3"></audio>
-
-    <!-- HEADER CHUNG -->
-    <div class="neu-card header-bar flex-between">
-        <div style="font-weight:900; font-size:1.8rem;">🦉 GRAMMAR<span style="color:#9333ea;">ARENA</span></div>
-        <div style="display:flex; gap:15px; align-items:center;">
-            <span style="background:#fed7aa; border:3px solid #000; padding:5px 12px; border-radius:8px; font-weight:900;">🔥 1 DAYS</span>
-            <div style="width:45px; height:45px; background:#fbbf24; border:3px solid #000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.2rem;">P1</div>
+    <!-- Header Stats -->
+    <div class="neu-card flex-between" style="position: sticky; top: 0; z-index: 100; background: #fff; padding: 10px 20px;">
+        <div style="font-weight:900; font-size:1.5rem;">🦉 ARENA <span id="rank-tag" class="tag" style="background:var(--w)">ROOKIE</span></div>
+        <div style="display:flex; gap:10px;">
+            <div class="tag" style="background:var(--s);">🔥 <span id="xp-display">0</span> XP</div>
         </div>
     </div>
 
-    <!-- MÀN HÌNH 1: BẢN ĐỒ (MAP VIEW) -->
+    <!-- MÀN HÌNH BẢN ĐỒ (MAP) -->
     <div id="map-view">
-        <div class="neu-card welcome-banner flex-between">
-            <div>
-                <h1 style="font-size: 2.2rem; margin-bottom: 5px;">Welcome back, Player 1! 👋</h1>
-                <p style="margin:0; font-weight:700; font-size: 1.1rem;">Rank: <span style="background:white; padding: 2px 8px; border: 2px solid #000; border-radius: 5px;">Rookie Master</span></p>
-            </div>
-            <div style="background:white; border:4px solid #000; width:85px; height:85px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.5rem; box-shadow:4px 4px 0px #000;">
-                <span id="global-xp">0</span>XP
-            </div>
+        <div class="neu-card" style="background: var(--p); color: white;">
+            <h1 style="margin:0;">TENSE QUEST MAP 🗺️</h1>
+            <p style="font-weight:600;">Chinh phục 12 thì - Thuộc lòng 3000 từ!</p>
         </div>
 
-        <h3>QUEST MAP</h3>
+        <h3>BATTLE STAGES</h3>
+        <div class="grid-2" id="tense-grid">
+            <!-- Render động bằng JS -->
+        </div>
+
         <div class="grid-2">
-            <!-- Render Quest Cards bằng JS cho gọn -->
-            <div class="neu-card" style="background:#bef264;">
-                <h2 style="margin-bottom: 5px;">Present Simple</h2>
-                <div style="font-weight:700;">Progress: <span id="prog-txt-present-simple">0</span>%</div>
-                <div class="progress-container"><div class="progress-bar" id="prog-bar-present-simple"></div></div>
-                <button class="btn-neu" style="margin-top: 15px;" onclick="startQuiz('Present Simple')">PLAY NOW</button>
-            </div>
-            <div class="neu-card" style="background:#7dd3fc;">
-                <h2 style="margin-bottom: 5px;">Present Continuous</h2>
-                <div style="font-weight:700;">Progress: <span id="prog-txt-present-continuous">0</span>%</div>
-                <div class="progress-container"><div class="progress-bar" id="prog-bar-present-continuous"></div></div>
-                <button class="btn-neu" style="margin-top: 15px;" onclick="startQuiz('Present Continuous')">PLAY NOW</button>
-            </div>
-            <div class="neu-card" style="background:#fbbf24;">
-                <h2 style="margin-bottom: 5px;">Past Simple</h2>
-                <div style="font-weight:700;">Progress: <span id="prog-txt-past-simple">0</span>%</div>
-                <div class="progress-container"><div class="progress-bar" id="prog-bar-past-simple"></div></div>
-                <button class="btn-neu" style="margin-top: 15px;" onclick="startQuiz('Past Simple')">PLAY NOW</button>
-            </div>
-            <div class="neu-card" style="background:#ff90e8;">
-                <h2 style="margin-bottom: 5px;">Past Continuous</h2>
-                <div style="font-weight:700;">Progress: <span id="prog-txt-past-continuous">0</span>%</div>
-                <div class="progress-container"><div class="progress-bar" id="prog-bar-past-continuous"></div></div>
-                <button class="btn-neu" style="margin-top: 15px;" onclick="startQuiz('Past Continuous')">PLAY NOW</button>
-            </div>
-            <div class="neu-card" style="background:#ff6b6b; grid-column: 1 / -1;">
-                <h2 style="margin-bottom: 5px;">Future Simple</h2>
-                <div style="font-weight:700;">Progress: <span id="prog-txt-future-simple">0</span>%</div>
-                <div class="progress-container"><div class="progress-bar" id="prog-bar-future-simple"></div></div>
-                <button class="btn-neu" style="margin-top: 15px;" onclick="startQuiz('Future Simple')">PLAY NOW</button>
-            </div>
-        </div>
-
-        <div class="grid-2" style="margin-top: 20px;">
+            <!-- Flashcard Section -->
             <div class="neu-card">
-                <h3>🎴 FLASHCARDS</h3>
-                <div id="flashcard-word" style="font-size:2rem; font-weight:900; color:#9333ea; margin:15px 0;">Algorithm</div>
-                <div id="flashcard-mean" style="font-size:1.2rem; font-weight:700; margin-bottom: 15px;">Thuật toán</div>
-                <button class="btn-neu" style="background: #eee;" onclick="nextFlashcard()">NEXT WORD 🔄</button>
+                <h3>🎴 SMART FLASHCARD</h3>
+                <div id="fc-box" style="text-align:center; padding: 15px; border: 3px dashed #000; border-radius: 10px; margin-bottom: 15px;">
+                    <div id="fc-word" style="font-size:2rem; font-weight:900; color:var(--p);">Algorithm</div>
+                    <div id="fc-phonetic" style="font-style:italic; font-weight:700; color:#555;">/ˈæl.ɡə.rɪ.ðəm/</div>
+                    <div id="fc-mean" style="font-size:1.1rem; font-weight:700; margin-top:10px;">Thuật toán</div>
+                </div>
+                <button class="btn-neu" onclick="nextFlashcard()">ĐÃ THUỘC! TIẾP 🔄</button>
             </div>
-            <div class="neu-card" style="background:#fde047;">
-                <h3>🏆 LIVE RANK</h3>
-                <div style="font-weight:900; font-size: 1.2rem; margin-top:10px;">#1 You (<span id="leaderboard-xp">0</span> XP)</div>
-                <div style="font-weight:800; color:#555; margin-top: 10px;">#2 Bot_Genius (1,200 XP)</div>
-                <hr style="border: 2px dashed #000; margin: 15px 0;">
-                <button class="btn-neu" style="background: #ff4b4b; color: white;" onclick="resetData()">RESET PROGRESS ⚠️</button>
+
+            <!-- Leaderboard -->
+            <div class="neu-card" style="background: var(--w);">
+                <h3>🏆 LEADERBOARD</h3>
+                <div style="font-weight:900; border-bottom: 2px solid #000; padding: 5px 0;">#1 YOU (<span class="user-xp">0</span> XP)</div>
+                <div style="font-weight:700; opacity: 0.7; padding: 5px 0;">#2 Bot_Pro (1,500 XP)</div>
+                <div style="font-weight:700; opacity: 0.7; padding: 5px 0;">#3 Oxford_AI (1,250 XP)</div>
+                <button class="btn-neu" style="background:#ff4b4b; color:#fff; margin-top:10px; font-size:0.8rem;" onclick="resetData()">RESET ALL ⚠️</button>
             </div>
         </div>
     </div>
 
-    <!-- MÀN HÌNH 2: ĐẤU TRƯỜNG (QUIZ VIEW) -->
+    <!-- MÀN HÌNH CHIẾN ĐẤU (QUIZ) -->
     <div id="quiz-view">
-        <h1 id="quiz-title" style="text-align:center; font-size: 2.5rem; text-transform: uppercase;">TENSE</h1>
-        
-        <div id="question-box" class="neu-card" style="text-align:center; padding:80px 20px; transition: 0.3s;">
-            <h2 id="question-text" style="font-size:2.5rem; line-height: 1.4;">Loading question...</h2>
-        </div>
-        
-        <div class="grid-2" id="options-container" style="margin-bottom: 20px;">
-            <!-- Buttons render here -->
-        </div>
+        <div class="neu-card">
+            <div class="flex-between">
+                <span id="quiz-title-tag" class="tag" style="background:white;">PRESENT SIMPLE</span>
+                <span id="combo-tag" style="font-weight:900; color:var(--d);"></span>
+            </div>
+            
+            <div id="q-container" style="text-align:center; padding: 50px 10px; min-height: 300px;">
+                <h2 id="q-text" style="font-size: 1.8rem; line-height: 1.4;">Loading...</h2>
+                <div id="ans-zone" style="margin-top: 30px;"></div>
+            </div>
 
-        <button class="btn-neu" style="background: #e5e7eb;" onclick="showView('map')">⬅️ BACK TO MAP</button>
+            <button class="btn-neu" style="background:#e5e7eb;" onclick="exitQuiz()">⬅️ RÚT LUI VỀ BẢN ĐỒ</button>
+        </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // --- DATA ENGINE ---
-        const SUBJECTS = [
-            {n: "The Pilot", p: "s"}, {n: "My cousins", p: "p"}, {n: "She", p: "s"}, 
-            {n: "Engineers", p: "p"}, {n: "I", p: "i"}, {n: "The robot", p: "s"},
-            {n: "The CEO", p: "s"}, {n: "We", p: "p"}
+        // --- DỮ LIỆU ---
+        const STAGES = [
+            { id: 'pres_sim', name: 'Present Simple', color: '#bef264', lvl: 1 },
+            { id: 'pres_cont', name: 'Present Cont.', color: '#7dd3fc', lvl: 1 },
+            { id: 'past_sim', name: 'Past Simple', color: '#fbbf24', lvl: 2 },
+            { id: 'past_cont', name: 'Past Cont.', color: '#ff90e8', lvl: 2 },
+            { id: 'pres_perf', name: 'Pres. Perfect', color: '#ff6b6b', lvl: 3 },
+            { id: 'fut_sim', name: 'Future Simple', color: '#9333ea', lvl: 1 }
         ];
-        const VERBS = [
-            {inf: "repair", s: "repairs", ed: "repaired", ing: "repairing"},
-            {inf: "design", s: "designs", ed: "designed", ing: "designing"},
-            {inf: "travel", s: "travels", ed: "traveled", ing: "traveling"},
-            {inf: "eat", s: "eats", ed: "ate", ing: "eating"},
-            {inf: "build", s: "builds", ed: "built", ing: "building"}
-        ];
-        const ADVERBS = {
-            "Present Simple": ["usually", "every Sunday", "frequently"],
-            "Present Continuous": ["at the moment", "right now", "currently"],
-            "Future Simple": ["tomorrow", "next week", "soon"],
-            "Past Simple": ["yesterday", "two hours ago", "last year"],
-            "Past Continuous": ["at 9 PM last night", "while I was cooking"]
+
+        const QUIZ_DB = {
+            'pres_sim': [
+                {q: "She (not/drink) ___ tea.", a: "doesn't drink", type: 1, dist: ["don't drink", "not drink"]},
+                {q: "The sun (rise) ___ in the East.", a: "rises", type: 1, dist: ["rising", "rise"]}
+            ],
+            'past_sim': [
+                {q: "We / visited / Paris / last / summer", a: "We visited Paris last summer", type: 2, words: ["visited", "Paris", "We", "summer", "last"]},
+                {q: "He / bought / a / new / car / yesterday", a: "He bought a new car yesterday", type: 2, words: ["a", "bought", "yesterday", "car", "new", "He"]}
+            ],
+            'pres_perf': [
+                {q: "I (be) ___ to Japan twice.", a: "have been", type: 3},
+                {q: "She (just/finish) ___ her lunch.", a: "has just finished", type: 3}
+            ]
         };
 
-        const VOCAB = [
-            {w: "Algorithm", m: "Thuật toán"}, {w: "Revenue", m: "Doanh thu"}, 
-            {w: "Hypothesis", m: "Giả thuyết"}, {w: "Deadline", m: "Hạn chót"},
-            {w: "Destination", m: "Điểm đến"}
+        const VOCAB_LIST = [
+            {w: "Algorithm", p: "/ˈæl.ɡə.rɪ.ðəm/ (n)", m: "Thuật toán"},
+            {w: "Substantial", p: "/səbˈstæn.ʃəl/ (adj)", m: "Đáng kể"},
+            {w: "Persuade", p: "/pəˈsweɪd/ (v)", m: "Thuyết phục"},
+            {w: "Hierarchy", p: "/ˈhaɪə.rɑː.ki/ (n)", m: "Hệ tư tưởng/Cấp bậc"},
+            {w: "Ambiguous", p: "/æmˈbɪɡ.ju.əs/ (adj)", m: "Mơ hồ"}
         ];
 
-        // --- STATE ---
+        // --- TRẠNG THÁI ---
         let xp = 0;
-        let progress = {
-            "Present Simple": 0, "Present Continuous": 0, 
-            "Past Simple": 0, "Past Continuous": 0, "Future Simple": 0
-        };
-        let currentTense = "";
-        let currentCorrectAns = "";
-        let vocabIdx = 0;
-        let isAnimating = false;
+        let progress = {};
+        let vocabQueue = [...VOCAB_LIST].sort(() => Math.random() - 0.5);
+        let curQData = [];
+        let curQIdx = 0;
+        let curStage = null;
 
-        // --- CORE FUNCTIONS ---
-        function getElement(id) { return document.getElementById(id); }
-
-        function showView(view) {
-            if (view === 'map') {
-                getElement('map-view').style.display = 'block';
-                getElement('quiz-view').style.display = 'none';
-                updateMapUI();
-            } else {
-                getElement('map-view').style.display = 'none';
-                getElement('quiz-view').style.display = 'block';
-            }
+        // --- KHỞI TẠO MAP ---
+        function renderMap() {
+            const grid = document.getElementById('tense-grid');
+            grid.innerHTML = '';
+            STAGES.forEach(s => {
+                const p = progress[s.id] || 0;
+                grid.innerHTML += `
+                    <div class="neu-card" style="background:${s.color}">
+                        <div class="flex-between"><span class="tag" style="background:#fff">LVL.${s.lvl}</span> <b>${p}%</b></div>
+                        <h3 style="margin:10px 0">${s.name}</h3>
+                        <div class="prog-container"><div class="prog-bar" style="width:${p}%"></div></div>
+                        <button class="btn-neu" style="padding:8px; font-size:0.8rem;" onclick="startQuiz('${s.id}')">BẮT ĐẦU</button>
+                    </div>
+                `;
+            });
+            document.getElementById('xp-display').innerText = xp;
+            document.querySelectorAll('.user-xp').forEach(el => el.innerText = xp);
         }
 
-        function updateMapUI() {
-            getElement('global-xp').innerText = xp;
-            getElement('leaderboard-xp').innerText = xp;
-            for (let tense in progress) {
-                let idFormat = tense.toLowerCase().replace(" ", "-");
-                getElement(`prog-txt-${idFormat}`).innerText = progress[tense];
-                getElement(`prog-bar-${idFormat}`).style.width = progress[tense] + "%";
-            }
-        }
-
+        // --- FLASHCARD ---
         function nextFlashcard() {
-            vocabIdx = (vocabIdx + 1) % VOCAB.length;
-            getElement('flashcard-word').innerText = VOCAB[vocabIdx].w;
-            getElement('flashcard-mean').innerText = VOCAB[vocabIdx].m;
-        }
-
-        function resetData() {
-            if(confirm("Bạn có chắc muốn xóa hết XP và tiến độ?")) {
-                xp = 0;
-                for(let k in progress) progress[k] = 0;
-                updateMapUI();
-            }
+            if (vocabQueue.length === 0) vocabQueue = [...VOCAB_LIST].sort(() => Math.random() - 0.5);
+            const item = vocabQueue.shift();
+            document.getElementById('fc-word').innerText = item.w;
+            document.getElementById('fc-phonetic').innerText = item.p;
+            document.getElementById('fc-mean').innerText = item.m;
         }
 
         // --- QUIZ LOGIC ---
-        function startQuiz(tense) {
-            currentTense = tense;
-            getElement('quiz-title').innerText = tense + " ARENA";
-            showView('quiz');
-            loadNewQuestion();
+        function startQuiz(id) {
+            curStage = STAGES.find(s => s.id === id);
+            curQData = (QUIZ_DB[id] || QUIZ_DB['pres_sim']).sort(() => Math.random() - 0.5);
+            curQIdx = 0;
+            document.getElementById('map-view').style.display = 'none';
+            document.getElementById('quiz-view').style.display = 'block';
+            document.getElementById('quiz-title-tag').innerText = curStage.name.toUpperCase();
+            loadQuestion();
         }
 
-        function loadNewQuestion() {
-            let sub = SUBJECTS[Math.floor(Math.random() * SUBJECTS.length)];
-            let v = VERBS[Math.floor(Math.random() * VERBS.length)];
-            let advList = ADVERBS[currentTense];
-            let adv = advList[Math.floor(Math.random() * advList.length)];
-            
-            let qText = "";
-            let opts = [];
+        function loadQuestion() {
+            const q = curQData[curQIdx];
+            const zone = document.getElementById('ans-zone');
+            document.getElementById('q-text').innerText = q.q;
+            zone.innerHTML = '';
 
-            if (currentTense === "Present Simple") {
-                currentCorrectAns = (sub.p === 's') ? v.s : v.inf;
-                qText = `${sub.n} ________ (${v.inf}) ${adv}.`;
-                opts = [v.s, v.inf, v.ing];
-            } else if (currentTense === "Present Continuous") {
-                let be = sub.p === 's' ? "is" : (sub.p === 'i' ? "am" : "are");
-                currentCorrectAns = `${be} ${v.ing}`;
-                qText = `Look! ${sub.n} ________ (${v.inf}) ${adv}.`;
-                opts = [currentCorrectAns, `${be} ${v.ed}`, v.s];
-            } else if (currentTense === "Past Simple") {
-                currentCorrectAns = v.ed;
-                qText = `${sub.n} ________ (${v.inf}) the house ${adv}.`;
-                opts = [v.ed, v.inf, `was ${v.ing}`];
-            } else if (currentTense === "Past Continuous") {
-                let be = (sub.p === 's' || sub.p === 'i') ? "was" : "were";
-                currentCorrectAns = `${be} ${v.ing}`;
-                qText = `${sub.n} ________ (${v.inf}) ${adv}.`;
-                opts = [currentCorrectAns, v.ed, `is ${v.ing}`];
-            } else if (currentTense === "Future Simple") {
-                currentCorrectAns = `will ${v.inf}`;
-                qText = `Maybe ${sub.n} ________ (${v.inf}) ${adv}.`;
-                opts = [currentCorrectAns, `is ${v.ing}`, v.ed];
+            if (q.type === 1) { // Trắc nghiệm
+                const opts = [...q.dist, q.a].sort(() => Math.random() - 0.5);
+                opts.forEach(opt => {
+                    const b = document.createElement('button');
+                    b.className = 'btn-neu';
+                    b.style.marginBottom = '10px';
+                    b.innerText = opt;
+                    b.onclick = () => checkAns(opt, q.a);
+                    zone.appendChild(b);
+                });
+            } else if (q.type === 2) { // Sắp xếp
+                let userArr = [];
+                const display = document.createElement('div');
+                display.className = 'neu-card';
+                display.style.minHeight = '60px';
+                display.style.fontSize = '1.3rem';
+                display.style.fontWeight = '800';
+                zone.appendChild(display);
+
+                q.words.sort(() => Math.random() - 0.5).forEach(w => {
+                    const chip = document.createElement('span');
+                    chip.className = 'word-chip';
+                    chip.innerText = w;
+                    chip.onclick = () => {
+                        userArr.push(w);
+                        display.innerText = userArr.join(" ");
+                        chip.style.visibility = 'hidden';
+                        if(userArr.length === q.words.length) setTimeout(() => checkAns(userArr.join(" "), q.a), 400);
+                    };
+                    zone.appendChild(chip);
+                });
+            } else if (q.type === 3) { // Gõ chữ
+                const input = document.createElement('input');
+                input.className = 'neu-input';
+                input.placeholder = "Nhập đáp án...";
+                input.onkeypress = (e) => { if(e.key === 'Enter') checkAns(input.value.trim(), q.a); };
+                zone.appendChild(input);
+                
+                const btn = document.createElement('button');
+                btn.className = 'btn-neu';
+                btn.innerText = "KIỂM TRA";
+                btn.onclick = () => checkAns(input.value.trim(), q.a);
+                zone.appendChild(btn);
             }
-
-            // Xóa trùng lặp và xáo trộn đáp án
-            opts = [...new Set(opts)];
-            opts.sort(() => Math.random() - 0.5);
-
-            // Cập nhật DOM
-            getElement('question-text').innerText = qText;
-            
-            let optsHtml = "";
-            opts.forEach(opt => {
-                optsHtml += `<button class="btn-neu" onclick="checkAnswer('${opt}')">${opt}</button>`;
-            });
-            getElement('options-container').innerHTML = optsHtml;
         }
 
-        function checkAnswer(selected) {
-            if (isAnimating) return; // Chặn click liên tục khi đang có hiệu ứng
-            isAnimating = true;
-
-            let qBox = getElement('question-box');
-
-            if (selected === currentCorrectAns) {
-                // ĐÚNG
-                xp += 20;
-                progress[currentTense] = Math.min(100, progress[currentTense] + 5);
+        function checkAns(input, target) {
+            const box = document.getElementById('q-container');
+            if (input.toLowerCase() === target.toLowerCase()) {
+                confetti({ particleCount: 100, spread: 70 });
+                xp += (curStage.lvl * 20);
+                progress[curStage.id] = Math.min(100, (progress[curStage.id] || 0) + 20);
                 
-                getElement('sound-success').currentTime = 0;
-                getElement('sound-success').play();
-                
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                
-                qBox.classList.add('pulse-effect');
-                setTimeout(() => {
-                    qBox.classList.remove('pulse-effect');
-                    loadNewQuestion();
-                    isAnimating = false;
-                }, 1000);
-
+                curQIdx++;
+                if(curQIdx < curQData.length) setTimeout(loadQuestion, 800);
+                else { alert("STAGE CLEAR! 🎉"); exitQuiz(); }
             } else {
-                // SAI
-                getElement('sound-fail').currentTime = 0;
-                getElement('sound-fail').play();
-                
-                qBox.classList.add('shake-effect');
-                getElement('question-text').innerText = `Oops! Correct answer is: ${currentCorrectAns}`;
-                
-                setTimeout(() => {
-                    qBox.classList.remove('shake-effect');
-                    loadNewQuestion();
-                    isAnimating = false;
-                }, 1500);
+                box.classList.add('shake');
+                setTimeout(() => box.classList.remove('shake'), 400);
+            }
+        }
+
+        function exitQuiz() {
+            document.getElementById('map-view').style.display = 'block';
+            document.getElementById('quiz-view').style.display = 'none';
+            renderMap();
+        }
+
+        function resetData() {
+            if(confirm("Xóa toàn bộ tiến độ?")) {
+                xp = 0; progress = {}; renderMap();
             }
         }
 
         // Init
-        updateMapUI();
+        renderMap();
+        nextFlashcard();
     </script>
 </body>
 </html>
